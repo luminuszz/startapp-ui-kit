@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
+/* eslint-disable jsx-a11y/scope */
 /* eslint-disable jsx-a11y/interactive-supports-focus */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/scope */
 import './styles.scss';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
@@ -13,12 +13,13 @@ interface IOption<IRowType> {
   value: keyof IRowType;
 }
 
-interface ITableConfig<IRowType> {
+export interface ITableConfig<IRowType> {
   // tslint:disable-next-line:array-type
   tableColumns: IOption<IRowType>[];
   tableTitle: string;
   pageOffSet: number;
   loading: boolean;
+  tableHeaderSticky?: boolean;
 }
 
 interface IFilterProps {
@@ -50,7 +51,7 @@ export interface INewTableProps<IRowType> {
   pushToDetails?: (budgetId: string) => void;
 }
 
-const NewTable: React.FC<INewTableProps<GenericExample>> = ({
+const NewTable: React.FC<INewTableProps<api.BudgetRequest>> = ({
   tableConfig,
   onClickNextPage,
   onClickDeleteIcon,
@@ -76,13 +77,18 @@ const NewTable: React.FC<INewTableProps<GenericExample>> = ({
         {filterConfig && (
           <>
             <div className="search-input">
-              <img src="../assets/search.svg" alt="search-icon" />
-              <input type="text" placeholder="Pesquisar" />
+              <img src="/search.svg" alt="search-icon" />
+              <input
+                type="text"
+                placeholder={filterConfig.input?.placeHolder}
+              />
             </div>
 
             <div className="select-filter">
               <select name="filter" id="filter">
-                <option aria-selected="true">Selecione uma coluna</option>
+                <option aria-selected="true">
+                  {filterConfig.select?.initialValue}
+                </option>
                 {tableConfig.tableColumns.map((item, index) => (
                   <option key={index} aria-selected="false" value={item.value}>
                     {item.label}
@@ -97,10 +103,15 @@ const NewTable: React.FC<INewTableProps<GenericExample>> = ({
       <table className="table">
         <thead>
           {actionsConditions && (
-            <tr>
-              <td scope="col" />
-              {tableConfig.tableColumns.map(column => (
-                <td scope="col" key={column.value}>
+            <tr
+              className={
+                tableConfig.tableHeaderSticky ? 'sticky-table-header' : ''
+              }
+            >
+              {!tableConfig.tableHeaderSticky && <td scope="col" />}
+
+              {tableConfig.tableColumns.map((column, index) => (
+                <td scope="col" key={index}>
                   {column.label}
                 </td>
               ))}
@@ -144,19 +155,19 @@ const NewTable: React.FC<INewTableProps<GenericExample>> = ({
         )}
       </table>
 
-      {!tablePopulate && (
+      {tablePopulate?.length === 0 && (
         <div className="message-info">
-          <span>Message</span>
+          <span>Não á dados</span>
         </div>
       )}
       <div className="table-footer">
         <div className="paginate">
           <span>{formatePage}</span>
           <button type="button" onClick={onClickPreviousPage}>
-            <img src="../assets/left-arrow.svg" alt="Previous" />
+            <img src="/left-arrow.svg" alt="Previous" />
           </button>
           <button type="button" onClick={onClickNextPage}>
-            <img src="../assets/next.svg" alt="Next" />
+            <img src="/next.svg" alt="Next" />
           </button>
         </div>
       </div>
